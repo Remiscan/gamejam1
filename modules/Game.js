@@ -96,7 +96,7 @@ export class Game {
   get timeBetweenMeteors() {
     const jmax = 100;
     let i = 11;
-    for (let j = 11; j < jmax; j++) {
+    for (let j = 11; j < jmax; j = j + 5) {
       if (this.meteorCount < i) return 10000 / j;
       i = i + j;
     }

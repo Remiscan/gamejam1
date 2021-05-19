@@ -1,6 +1,8 @@
+import Params from './Params.js';
 import Player from './Player.js';
-import { Meteor } from './Meteor.js';
+import Meteor from './Meteor.js';
 import Bonus from './Bonus.js';
+import Decoration from './Decoration.js';
 
 
 const keys = {
@@ -9,106 +11,34 @@ const keys = {
   left: ['ArrowLeft'],
   right: ['ArrowRight']
 };
-let keysActive = false;
+let activeGame;
 
 
 export class Game {
   constructor() {
-    this.container = document.querySelector('.container');
-    const containerStyles = getComputedStyle(this.container);
-    this.cellSize = containerStyles.getPropertyValue('--cell-size');
-    this.columns = containerStyles.getPropertyValue('--columns');
-    this.rows = containerStyles.getPropertyValue('--rows');
-    this.playerMoveDuration = containerStyles.getPropertyValue('--player-move-duration');
+    this.id = Date.now();
+    activeGame = this.id;
+
+    this.players = [];
+    this.bonuses = [];
+    this.meteors = [];
+    this.meteorCount = 0;
+
     this.score = 0;
     this.bestScore = Number(localStorage.getItem('boole-best-score')) || 0;
-    this.meteorCount = 0;
+    
+    this.moving = false;
+    this.over = false;
   }
 
-  // Start the game
-  async start() {
-    const id = Date.now();
-    this.id = id;
 
-    document.querySelector('.title-screen').classList.add('off');
-    document.querySelector('.game-over').classList.remove('on');
-    document.querySelector('.score-container').classList.add('on');
+  /*****************************************
+  ***** GAME PARAMETERS ********************
+  ******************************************/
 
-    const scoreElements = document.querySelectorAll('.score');
-    scoreElements.forEach(e => e.innerHTML = 0);
-    const bestScoreElements = document.querySelectorAll('.best-score');
-    bestScoreElements.forEach(e => e.innerHTML = this.bestScore);
-
-    // Detects key presses to move players
-    if (!keysActive) {
-      window.addEventListener('gameover', () => {
-        console.log('game over');
-        this.gameOver();
-      });
-    }
-    if (!keysActive) this.detectKeys();
-
-    // Place decorations
-    const decoTypes = 2;
-    for (let i = 0; i < 4; i++) {
-      const element = document.createElement('div');
-      element.classList.add('deco');
-      const r = Math.round((decoTypes - 1) * Math.random()) + 1;
-      element.classList.add(`deco${r}`);
-      const rx = Math.round((this.columns - 1) * Math.random()) + 1;
-      const ry = Math.round((this.rows - 1) * Math.random()) + 1;
-      element.style.setProperty('--column', rx);
-      element.style.setProperty('--row', ry);
-      this.container.appendChild(element);
-    }
-
-    // Spawns the first player
-    const player = new Player(this);
-    player.spawn();
-
-    // Spawns meteors
-    while (id == this.id) {
-      const r = Math.round((Player.all.length - 1) * Math.random());
-      this.spawnMeteors(id, Player.all[r]);
-      await new Promise(resolve => setTimeout(resolve, this.timeBetweenMeteors));
-    }
-  }
-
-  // Spawn meteors
-  async spawnMeteors(id, player) {
-    if (id != this.id) return;
-    console.log(this, Player.all, Bonus.all);
-    const meteor = new Meteor(this, player);
-    meteor.spawn();
-    await meteor.fall();
-
-    // Kill the player crushed by the meteor
-    const playersAlreadyThere = Player.all.filter(p => (p.position.x == meteor.position.x && p.position.y == meteor.position.y));
-    playersAlreadyThere.forEach(p => p.loseLife(id));
-
-    // Kill the players who walk into the meteor during a short interval after it crashes
-    const killPlayers = event => {
-      if (id != this.id) return;
-      if (event.detail.position.x != meteor.position.x || event.detail.position.y != meteor.position.y) return;
-      event.detail.player.loseLife(id);
-    };
-    window.addEventListener('moveto', killPlayers);
-    await new Promise(resolve => setTimeout(resolve, meteor.killDuration));
-    window.removeEventListener('moveto', killPlayers);
-
-    // Remove the meteor after its crash
-    meteor.destroy();
-
-    if (id != this.id) return;
-
-    // Spawn a bonus in its place
-    const r = Math.round(100 * Math.random());
-    if (r <= this.bonusChance) this.spawnBonus(id);
-
-    // If all players are dead, game over.
-    // If not, bump the score.
-    if (Player.all.length <= 0)  this.gameOver();
-    else                      this.bumpScore();
+  // Time it takes for a player to move from a cell to its neighbour (ms)
+  get playerMoveDuration() {
+    return 100;
   }
 
   // Time to wait between spawning meteors (ms)
@@ -144,32 +74,6 @@ export class Game {
     return 50;
   }
 
-  // Spawn bonus
-  async spawnBonus(id) {
-    if (id != this.id) return;
-
-    const bonus = new Bonus(this);
-    this.checkSpawn(bonus, [...Bonus.all, ...Player.all], id);
-
-    const buffPlayers = event => {
-      if (id != this.id) return;
-      if (bonus.used) return;
-      if (event.detail.position.x != bonus.position.x || event.detail.position.y != bonus.position.y) return;
-      bonus.used = true;
-      bonus.destroy();
-      if (bonus.type == 'clone') {
-        const player = new Player(this);
-        player.lives = event.detail.player.lives;
-        this.checkSpawn(player, [...Bonus.all, ...Player.all], id);
-      }
-    }
-
-    window.addEventListener('moveto', buffPlayers);
-    await new Promise(resolve => setTimeout(resolve, this.bonusDuration));
-    window.removeEventListener('moveto', buffPlayers);
-    bonus.destroy();
-  }
-
   // Duration of a bonus on the map (ms)
   get bonusDuration() {
     return 10000;
@@ -180,19 +84,193 @@ export class Game {
     return 5;
   }
 
-  // Duration of the tomb after death
+  // Duration of the tomb on the map after death (ms)
   get tombDuration() {
     return 5000;
   }
 
-  // Checks if it's safe to spawn something at a random place
-  checkSpawn(thing, thingList, id) {
-    if (id != this.id) return;
-    const rx = Math.round((this.columns - 1) * Math.random()) + 1;
-    const ry = Math.round((this.rows - 1) * Math.random()) + 1;
-    const alreadyThere = thingList.filter(p => (p.position.x == rx && p.position.y == ry));
-    if (alreadyThere.length == 0) return thing.spawn(rx, ry);
-    else                          return this.checkSpawn(thing, thingList, id);
+
+  /*****************************************
+  ***** GAME METHODS ***********************
+  ******************************************/
+
+  // Start the game
+  async start() {
+    if (Params.log) console.log(`--- NEW GAME (${this.id}) ---`);
+    document.querySelector('.title-screen').classList.add('off');
+    document.querySelector('.game-over').classList.add('off');
+
+    // Remove elements from previous game
+    Params.container.innerHTML = '';
+
+    // Display score
+    const scoreElements = document.querySelectorAll('.score');
+    scoreElements.forEach(e => e.innerHTML = 0);
+
+    // Detect key presses to move players
+    window.addEventListener('gameover', this.gameOver.bind(this));
+    window.addEventListener('keydown', this.detectKeys.bind(this));
+
+    // Place decorations
+    const decorationsNumber = 4;
+    for (let i = 0; i < decorationsNumber; i++) {
+      const decoration = new Decoration();
+      decoration.spawn();
+    }
+
+    // Spawn the first player
+    this.createPlayer();
+
+    // Spawns meteors
+    while (this.check('meteor spawn loop')) {
+      let r = Math.round((this.players.length - 1) * Math.random());
+      const player = this.players[r];
+
+      r = Math.round(100 * Math.random());
+      let rx, ry;
+      if (r <= this.aimAtPlayer) {
+        rx = Math.round(player?.position.x || 0);
+        ry = Math.round(player?.position.y || 0);
+      } else {
+        rx = Math.round((Params.columns - 1) * Math.random()) + 1;
+        ry = Math.round((Params.rows - 1) * Math.random()) + 1;
+      }
+
+      this.createMeteor({ position: { x: rx, y: ry } });
+      await Params.wait(this.timeBetweenMeteors);
+    }
+  }
+
+  // Create a new player
+  createPlayer(options) {
+    const player = new Player(options);
+    this.players.push(player);
+    player.spawn();
+  }
+
+  // Get alive players
+  get alivePlayers() {
+    return this.players.filter(p => p.lives > 0);
+  }
+
+  // Create a new meteor
+  async createMeteor(options) {
+    if (!this.check('createMeteor')) return;
+
+    const meteor = new Meteor(options);
+    this.meteorCount++;
+    meteor.spawn();
+    await meteor.fall(this.fallDuration);
+
+    if (!this.check('meteor kill zone')) return;
+
+    let gameOver = false;
+    window.addEventListener('gameover', event => {
+      if (event.detail.game == Game.current) {
+        gameOver = true;
+      }
+    });
+
+    // Kill the player crushed by the meteor
+    const playersAlreadyThere = this.players.filter(p => p.position.x == meteor.position.x && p.position.y == meteor.position.y);
+    for (const player of playersAlreadyThere) {
+      if (!this.check('crush player')) return;
+      player.loseLife(this.tombDuration);
+      if (this.alivePlayers.length <= 0) window.dispatchEvent(new CustomEvent('gameover', { detail: { game: this.id }}));
+    }
+
+    // Kill players who enter the meteor cell during its kill duration
+    const killPlayer = event => {
+      if (!this.check('kill wandering player')) return;
+      if (event.detail.position.x == meteor.position.x && event.detail.position.y == meteor.position.y) {
+        event.detail.player.loseLife(this.tombDuration);
+        if (this.alivePlayers.length <= 0) window.dispatchEvent(new CustomEvent('gameover', { detail: { game: this.id }}));
+      }
+    };
+    window.addEventListener('moveto', killPlayer);
+    await Params.wait(meteor.killDuration);
+
+    // Remove the meteor after its kill duration
+    window.removeEventListener('moveto', killPlayer);
+    meteor.destroy();
+    this.updateElements();
+
+    // If all players are dead, game over
+    if (gameOver) return;
+    if (!this.check('everyone dead')) return;
+    
+    // Bump the score
+    this.bumpScore();
+
+    // Spawn a bonus in the meteor's place
+    const r = Math.round(100 * Math.random());
+    if (r <= this.bonusChance) this.createBonus(meteor);
+  }
+
+  // Create a bonus
+  async createBonus(meteor) {
+    if (!this.check('createBonus')) return;
+
+    const bonus = new Bonus({ position: { x: meteor.position.x, y: meteor.position.y } });
+    bonus.spawn();
+
+    const buffPlayers = event => {
+      if (bonus.used) return;
+      if (event.detail.position.x != bonus.position.x || event.detail.position.y != bonus.position.y) return;
+
+      bonus.used = true;
+      bonus.destroy();
+      this.updateElements();
+
+      if (bonus.type == 'clone') {
+        const cell = this.getEmptyCell();
+        this.createPlayer({ position: { x: cell.x, y: cell.y }, lives: event.detail.player.lives });
+      }
+    }
+    window.addEventListener('moveto', buffPlayers);
+    await new Promise(resolve => setTimeout(resolve, this.bonusDuration));
+
+    // Remove bonus after its on-map duration
+    window.removeEventListener('moveto', buffPlayers);
+    bonus.destroy();
+    this.updateElements();
+  }
+
+  // Get empty cells
+  get emptyCells() {
+    const emptyCells = [];
+
+    const currentElements = [
+      ...this.players.filter(p => !p.destroyed),
+      ...this.bonuses.filter(b => !b.destroyed),
+      ...this.meteors.filter(m => !m.destroyed)
+    ];
+
+    for (let column = 1; column < Params.columns; column++) {
+      for (let row = 1; row < Params.rows; row++) {
+        if (currentElements.filter(e => e.position.x == column && e.position.y == row).length > 0) {
+          continue;
+        } else {
+          emptyCells.push({ x: column, y: row });
+        }
+      }
+    }
+
+    return emptyCells;
+  }
+
+  // Get a random empty cell
+  getEmptyCell() {
+    const emptyCells = this.emptyCells;
+    const r = Math.round((emptyCells.length - 1) * Math.random());
+    return emptyCells[r];
+  }
+
+  // Update the list of game elements
+  updateElements() {
+    this.players = this.players.filter(p => !p.destroyed);
+    this.bonuses = this.bonuses.filter(b => !b.destroyed);
+    this.meteors = this.meteors.filter(m => !m.destroyed);
   }
 
   // Bump the score
@@ -214,57 +292,58 @@ export class Game {
   }
 
   // End the game
-  gameOver() {
-    const allMeteors = [...document.querySelectorAll('.meteor')];
-    allMeteors.forEach(m => m.remove());
-    const allBonuses = [...document.querySelectorAll('.bonus')];
-    allBonuses.forEach(b => b.remove());
-    Bonus.resetAll();
-    const allPlayers = [...document.querySelectorAll('.player')];
-    allPlayers.forEach(p => p.remove());
-    Player.resetAll();
-    const allDecorations = [...document.querySelectorAll('.deco')];
-    allDecorations.forEach(d => d.remove());
+  gameOver(event) {
+    if (event.detail.game != Game.current) return;
+
+    Params.container.innerHTML = '';
+    this.over = true;
+    if (Params.log) console.log(`Game ${this.id} over`);
 
     const element = document.querySelector('.game-over');
-    element.classList.add('on');
+    element.classList.remove('off');
     element.querySelector('button').focus();
 
-    this.score = 0;
-    this.id = 0;
-    this.meteorCount = 0;
+    window.removeEventListener('gameover', this.gameOver);
+    window.removeEventListener('keydown', this.detectKeys);
   }
 
   // Detects key presses
-  detectKeys() {
-    keysActive = true;
+  async detectKeys(event) {
+    if (![...keys.up, ...keys.down, ...keys.left, ...keys.right].includes(event.code)) return;
+    if (this.moving) return;
+    this.moving = true;
 
-    let moving = false;
-    window.addEventListener('keydown', async event => {
-      if (![...keys.up, ...keys.down, ...keys.left, ...keys.right].includes(event.code)) return;
-      if (moving) return;
-      moving = true;
+    let directionX = 0, directionY = 0;
+    if (keys.up.includes(event.code)) directionY--;
+    if (keys.down.includes(event.code)) directionY++;
+    if (keys.left.includes(event.code)) directionX--;
+    if (keys.right.includes(event.code)) directionX++;
 
-      let directionX = 0, directionY = 0;
-      if (keys.up.includes(event.code)) directionY--;
-      if (keys.down.includes(event.code)) directionY++;
-      if (keys.left.includes(event.code)) directionX--;
-      if (keys.right.includes(event.code)) directionX++;
+    await Promise.all(this.alivePlayers.map(player => {
+      // Switch sprite orientation based on the movement direction
+      if (directionX > 0) player.element.classList.add('facing-right');
+      else if (directionX < 0) player.element.classList.remove('facing-right');
 
-      await Promise.all(Player.all.map(player => {
-        // If a player is already on the destination tile, don't move there
-        const playersAlreadyThere = Player.all.filter(p => (p.position.x == player.position.x + directionX && p.position.y == player.position.y + directionY));
-        if (playersAlreadyThere.length == 0)
-          player.moveTo(player.position.x + directionX, player.position.y + directionY);
+      // If a player is already on the destination tile, don't move
+      const playersAlreadyThere = this.players.filter(p => (p.position.x == player.position.x + directionX && p.position.y == player.position.y + directionY && !p.destroyed));
+      if (playersAlreadyThere.length == 0)
+        return player.moveTo(player.position.x + directionX, player.position.y + directionY, this.playerMoveDuration);
+      else return;
+    }));
+    this.moving = false;
+    return;
+  }
 
-        if (player.lives <= 0) return;
+  // Check if this game is still playing
+  check(action) {
+    let valid = true, message;
+    if (this.over)              valid = false, message = 'game is over';
+    if (this.id != activeGame)  valid = false, message = `a more recent game ${activeGame} exists`;
+    if (Params.log && !valid) console.log(`Action [${action}] stopped in game ${this.id} because ${message}`);
+    return valid;
+  }
 
-        // Switch sprite orientation based on the movement direction
-        if (directionX > 0) player.element.classList.add('facing-right');
-        else if (directionX < 0) player.element.classList.remove('facing-right');
-      }));
-      moving = false;
-      return;
-    });
+  static get current() {
+    return activeGame;
   }
 }

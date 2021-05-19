@@ -1,72 +1,78 @@
-const players = [];
+import Params from './Params.js';
 
 export default class Player {
-  constructor(game) {
-    this.game = game;
+  constructor(options = {
+    position: {
+      x: Math.round((Params.columns - 1) * Math.random()) + 1,
+      y: Math.round((Params.rows - 1) * Math.random()) + 1
+    },
+    lives: 1
+  }) {
+    this.id = Date.now();
     this.position = {
-      x: 0,
-      y: 0
+      x: options.position.x,
+      y: options.position.y
     };
-    this.lives = 1;
+    this.lives = options.lives;
+    this.element = null;
+    this.destroyed = false;
   }
 
-  spawn(column = Math.round(this.game.columns / 2), row = Math.round(this.game.rows / 2)) {
-    this.id = Date.now();
+  // Update the player's position
+  updatePosition(column, row) {
+    this.element?.style.setProperty('--column', column);
+    this.position.x = column;
+    this.element?.style.setProperty('--row', row);
+    this.position.y = row;
+  }
+
+  // Place the player on the map
+  spawn() {
     const element = document.createElement('div');
     element.classList.add('player');
-    element.style.setProperty('--column', column);
-    this.position.x = column;
-    element.style.setProperty('--row', row);
-    this.position.y = row;
-    this.game.container.appendChild(element);
     this.element = element;
-    players.push(this);
+    
+    this.updatePosition(this.position.x, this.position.y);
+    Params.container.appendChild(element);
+
+    if (Params.log) console.log(`Player ${this.id} spawned`);
   }
 
-  async moveTo(column, row) {
+  // Move the player to one of its neighbour cells
+  async moveTo(column, row, duration) {
     if (this.lives <= 0) return;
-    const newColumn = Math.max(1, Math.min(Math.round(column), this.game.columns));
-    const newRow = Math.max(1, Math.min(Math.round(row), this.game.rows));
-    this.element.style.setProperty('--column', newColumn);
-    this.position.x = newColumn;
-    this.element.style.setProperty('--row', newRow);
-    this.position.y = newRow;
+
+    const newColumn = Math.max(1, Math.min(Math.round(column), Params.columns));
+    const newRow = Math.max(1, Math.min(Math.round(row), Params.rows));
+
+    //if (Params.log) console.log(`Player ${this.id} moved (column ${this.position.x} => ${newColumn}, row ${this.position.y} => ${newRow})`);
+
+    this.updatePosition(newColumn, newRow);
+
     window.dispatchEvent(new CustomEvent('moveto', { detail: {
       position: { x: newColumn, y: newRow },
       player: this
     } }));
-    await new Promise(resolve => setTimeout(resolve, this.game.playerMoveDuration));
-    return;
+
+    return Params.wait(duration);
   }
 
-  loseLife(id) {
-    if (id != this.game.id) return;
+  // Remove a life from the player
+  loseLife(tombDuration) {
     this.lives--;
-    if (this.lives <= 0) this.die(id);
+    if (Params.log) console.log(`Player ${this.id} lost a life (${this.lives} remaining)`);
+    if (this.lives <= 0) this.die(tombDuration);
   }
 
-  async die(id) {
-    if (id != this.game.id) return;
-    console.log(`Player ${this.id} dead`);
+  // Kill the player
+  async die(tombDuration) {
+    if (Params.log) console.log(`Player ${this.id} died`);
     this.element.classList.add('dead');
 
-    if (players.filter(p => p.lives <= 0).length == players.length) {
-      window.dispatchEvent(new Event('gameover'));
-    }
-
-    await new Promise(resolve => setTimeout(resolve, this.game.tombDuration));
-
+    await new Promise(resolve => setTimeout(resolve, tombDuration));
+    
     this.element?.remove();
-    if (id != this.game.id) return;
-    const k = players.findIndex(p => p.id == this.id);
-    players.splice(k, 1);
-  }
-
-  static get all() {
-    return players;
-  }
-
-  static resetAll() {
-    return players.length = 0;
+    this.destroyed = true;
+    return;
   }
 }

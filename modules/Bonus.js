@@ -1,41 +1,37 @@
+import Params from './Params.js';
+
 const bonusTypes = ['clone'];
-const bonuses = [];
 
 export default class Bonus {
-  constructor(game) {
-    this.game = game;
-    const r = Math.round((bonusTypes.length - 1) * Math.random());
-    this.type = bonusTypes[r];
+  constructor(options = {
+    type: bonusTypes[Math.round((bonusTypes.length - 1) * Math.random())],
+    position: {
+      x: 1,
+      y: 1
+    }
+  }) {
+    this.type = bonusTypes[Math.round((bonusTypes.length - 1) * Math.random())];
     this.position = {
-      x: 0,
-      y: 0
+      x: options.position.x,
+      y: options.position.y
     };
     this.used = false;
+    this.destroyed = false;
   }
 
-  spawn(column, row) {
-    this.id = bonuses.length;
+  spawn() {
     const element = document.createElement('div');
     element.classList.add('bonus', this.type);
-    element.style.setProperty('--column', column);
-    this.position.x = column;
-    element.style.setProperty('--row', row);
-    this.position.y = row;
-    this.game.container.appendChild(element);
+    element.style.setProperty('--column', this.position.x);
+    element.style.setProperty('--row', this.position.y);
+    Params.container.appendChild(element);
     this.element = element;
-    bonuses.push(this);
+
+    if (Params.log) console.log(`Bonus (${this.type}) created`);
   }
 
   destroy() {
     this.element?.remove();
-    bonuses.splice(this.id, 1);
-  }
-
-  static get all() {
-    return bonuses;
-  }
-
-  static resetAll() {
-    return bonuses.length = 0;
+    this.destroyed = true;
   }
 }

@@ -1,3 +1,7 @@
+/************************
+** Page *****************
+************************/
+
 html {
   width: 100%;
   height: 100%;
@@ -17,8 +21,53 @@ button {
   font: inherit;
 }
 
+
+
+/************************
+** Around the game ******
+************************/
+
 .container {
-  --player-move-duration: 100;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  overflow: hidden;
+}
+
+.title-screen {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+}
+
+.game-over {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: grid;
+  place-items: center;
+  z-index: 3;
+}
+
+.score-container {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: .3rem 0;
+}
+
+
+
+/************************
+** The game itself ******
+************************/
+
+.game {
+  grid-column: 1 / -1;
+  grid-row: 1;
 
   --cell-size: 64;
   --columns: 13;
@@ -31,13 +80,7 @@ button {
   grid-template-rows: repeat(var(--rows), calc(var(--cell-size) * 1px));
   background-color: black;
   overflow: hidden;
-}
-
-.title-screen {
-  grid-column: 1 / -1;
-  grid-row: 1 / -1;
-  display: grid;
-  place-items: center;
+  z-index: 1;
 }
 
 .sprite,
@@ -52,6 +95,8 @@ button {
   position: relative;
 }
 
+/* Player */
+
 .player {
   background-image: url('./assets/boole1.png');
   z-index: 5;
@@ -65,6 +110,8 @@ button {
   background-image: url('./assets/tomb.png');
 }
 
+/* Bonus */
+
 .bonus {
   z-index: 2;
 }
@@ -73,15 +120,17 @@ button {
   background-image: url('./assets/bonus_mult.png');
 }
 
-.meteor {
-  background-image: url('./assets/shadow2.png');
-  z-index: 1;
-  animation: opacify .2s linear;
-}
+/* Meteor */
 
 @keyframes opacify {
   0% { opacity: 0; }
   100% { opacity: 1; }
+}
+
+.meteor {
+  background-image: url('./assets/shadow2.png');
+  z-index: 1;
+  animation: opacify .2s linear;
 }
 
 .meteor.bigger {
@@ -103,20 +152,7 @@ button {
   z-index: 2;
 }
 
-.score-container {
-  display: none;
-  grid-column: 1 / -1;
-  grid-row: -2;
-  justify-content: space-around;
-  align-items: flex-end;
-}
-
-.game-over {
-  display: none;
-  grid-column: 1 / -1;
-  grid-row: 1 / -1;
-  place-items: center;
-}
+/* Decoration */
 
 .deco {
   z-index: 0;
@@ -129,12 +165,11 @@ button {
   background-image: url('./assets/deco2.png');
 }
 
-.on {
-  display: grid;
-}
-.score-container.on {
-  display: flex;
-}
+
+
+/* -------------------------- */
+
+
 
 .off {
   display: none;

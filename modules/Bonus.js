@@ -10,6 +10,7 @@ class Bonus {
       x: 0,
       y: 0
     };
+    this.used = false;
   }
 
   spawn(column, row) {

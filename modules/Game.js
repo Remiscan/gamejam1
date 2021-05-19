@@ -131,19 +131,20 @@ export class Game {
     this.checkSpawn(bonus, [...bonuses, ...players]);
 
     const buffPlayers = event => {
+      if (bonus.used) return;
       if (event.detail.position.x != bonus.position.x || event.detail.position.y != bonus.position.y) return;
+      bonus.used = true;
+      bonus.destroy();
       if (bonus.type == 'clone') {
         const player = new Player(this);
         player.lives = event.detail.player.lives;
         this.checkSpawn(player, [...bonuses, ...players]);
       }
-      bonus.destroy();
     }
 
     window.addEventListener('moveto', buffPlayers);
     await new Promise(resolve => setTimeout(resolve, this.bonusDuration));
     window.removeEventListener('moveto', buffPlayers);
-
     bonus.destroy();
   }
 

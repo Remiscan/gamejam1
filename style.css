@@ -1,6 +1,7 @@
 html {
   width: 100%;
   height: 100%;
+  font-size: 1.2rem;
 }
 
 body {
@@ -9,6 +10,10 @@ body {
   margin: 0;
   display: grid;
   place-items: center;
+}
+
+button {
+  padding: .3rem;
 }
 
 .container {

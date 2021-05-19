@@ -63,7 +63,8 @@ button {
   z-index: 2;
 }
 
-.title {
+.title,
+.you-lost {
   grid-column: 1 / -1;
   grid-row: 1;
   display: grid;
@@ -102,6 +103,12 @@ button {
   grid-row: 1;
   grid-column: 2;
   background-image: url('./assets/boole1.png');
+}
+
+.tombe {
+  grid-row: 1;
+  grid-column: 2;
+  background-image: url('./assets/tomb.png');
 }
 
 .description {

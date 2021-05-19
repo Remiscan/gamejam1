@@ -18,5 +18,5 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   // Focus title screen play button
-  document.querySelector('.title-screen button').focus();
+  document.querySelector('.first-start').focus();
 });

@@ -98,7 +98,6 @@ export class Game {
   async start() {
     if (Params.log) console.log(`--- NEW GAME (${this.id}) ---`);
     document.querySelector('.title-screen').classList.add('off');
-    document.querySelector('.game-over').classList.add('off');
 
     // Remove elements from previous game
     Params.container.innerHTML = '';
@@ -299,9 +298,10 @@ export class Game {
     this.over = true;
     if (Params.log) console.log(`Game ${this.id} over`);
 
-    const element = document.querySelector('.game-over');
+    const element = document.querySelector('.title-screen');
+    element.classList.add('game-over');
     element.classList.remove('off');
-    element.querySelector('button').focus();
+    element.querySelector('.try-again').focus();
 
     window.removeEventListener('gameover', this.gameOver);
     window.removeEventListener('keydown', this.detectKeys);

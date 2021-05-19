@@ -38,8 +38,8 @@ export default class Meteor {
       fill: 'backwards',
       easing: 'linear'
     });
-    setTimeout(() => this.element.classList.add('bigger'), 5 * duration / 8);
-    setTimeout(() => this.element.classList.add('biggest'), 7 * duration / 8);
+    setTimeout(() => this.element.classList.add('bigger'), 4 * duration / 8);
+    setTimeout(() => this.element.classList.add('biggest'), 6 * duration / 8);
     return Params.wait(fallAnimation);
   }
 

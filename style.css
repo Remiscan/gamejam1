@@ -56,6 +56,10 @@ button {
   transform: scaleX(-1);
 }
 
+.player.dead {
+  background-image: url('./assets/tomb.png');
+}
+
 .bonus {
   grid-column: var(--column);
   grid-row: var(--row);

@@ -1,7 +1,7 @@
 const bonusTypes = ['clone'];
 const bonuses = [];
 
-class Bonus {
+export default class Bonus {
   constructor(game) {
     this.game = game;
     const r = Math.round((bonusTypes.length - 1) * Math.random());
@@ -30,6 +30,12 @@ class Bonus {
     this.element?.remove();
     bonuses.splice(this.id, 1);
   }
-}
 
-export { bonuses, Bonus };
+  static get all() {
+    return bonuses;
+  }
+
+  static resetAll() {
+    return bonuses.length = 0;
+  }
+}

@@ -1,6 +1,6 @@
 const players = [];
 
-class Player {
+export default class Player {
   constructor(game) {
     this.game = game;
     this.position = {
@@ -24,6 +24,7 @@ class Player {
   }
 
   async moveTo(column, row) {
+    if (this.lives <= 0) return;
     const newColumn = Math.max(1, Math.min(Math.round(column), this.game.columns));
     const newRow = Math.max(1, Math.min(Math.round(row), this.game.rows));
     this.element.style.setProperty('--column', newColumn);
@@ -38,21 +39,32 @@ class Player {
     return;
   }
 
-  loseLife() {
+  loseLife(id) {
     this.lives--;
-    if (this.lives <= 0) this.die();
+    if (this.lives <= 0) this.die(id);
   }
 
-  die() {
+  async die(id) {
     console.log(`Player ${this.id} dead`);
-    this.element?.remove();
-    const k = players.findIndex(p => p.id == this.id);
-    players.splice(k, 1);
+    this.element.classList.add('dead');
 
-    if (players.length <= 0) {
+    if (id == this.game.id && players.filter(p => p.lives <= 0).length == players.length) {
       window.dispatchEvent(new Event('gameover'));
     }
+
+    await new Promise(resolve => setTimeout(resolve, this.game.tombDuration));
+
+    this.element?.remove();
+    if (id != this.game.id) return;
+    const k = players.findIndex(p => p.id == this.id);
+    players.splice(k, 1);
+  }
+
+  static get all() {
+    return players;
+  }
+
+  static resetAll() {
+    return players.length = 0;
   }
 }
-
-export { players, Player };

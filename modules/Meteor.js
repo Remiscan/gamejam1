@@ -4,8 +4,8 @@ export class Meteor {
     const r = Math.round(100 * Math.random());
     if (r <= this.game.aimAtPlayer) {
       this.position = {
-        x: Math.round(player.position.x),
-        y: Math.round(player.position.y)
+        x: Math.round(player?.position.x || 0),
+        y: Math.round(player?.position.y || 0)
       };
     } else {
       this.position = {

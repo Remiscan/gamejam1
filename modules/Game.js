@@ -1,6 +1,6 @@
-import { players, Player } from './Player.js';
+import Player from './Player.js';
 import { Meteor } from './Meteor.js';
-import { bonuses, Bonus } from './Bonus.js';
+import Bonus from './Bonus.js';
 
 
 const keys = {
@@ -54,26 +54,29 @@ export class Game {
 
     // Spawns meteors
     while (id == this.id) {
-      const r = Math.round((players.length - 1) * Math.random());
-      this.spawnMeteors(players[r]);
+      const r = Math.round((Player.all.length - 1) * Math.random());
+      this.spawnMeteors(id, Player.all[r]);
       await new Promise(resolve => setTimeout(resolve, this.timeBetweenMeteors));
     }
   }
 
   // Spawn meteors
-  async spawnMeteors(player) {
+  async spawnMeteors(id, player) {
+    if (id != this.id) return;
+    console.log(this, Player.all, Bonus.all);
     const meteor = new Meteor(this, player);
     meteor.spawn();
     await meteor.fall();
 
     // Kill the player crushed by the meteor
-    const playersAlreadyThere = players.filter(p => (p.position.x == meteor.position.x && p.position.y == meteor.position.y));
-    playersAlreadyThere.forEach(p => p.loseLife());
+    const playersAlreadyThere = Player.all.filter(p => (p.position.x == meteor.position.x && p.position.y == meteor.position.y));
+    playersAlreadyThere.forEach(p => p.loseLife(id));
 
     // Kill the players who walk into the meteor during a short interval after it crashes
     const killPlayers = event => {
+      if (id != this.id) return;
       if (event.detail.position.x != meteor.position.x || event.detail.position.y != meteor.position.y) return;
-      event.detail.player.loseLife();
+      event.detail.player.loseLife(id);
     };
     window.addEventListener('moveto', killPlayers);
     await new Promise(resolve => setTimeout(resolve, meteor.killDuration));
@@ -82,13 +85,15 @@ export class Game {
     // Remove the meteor after its crash
     meteor.destroy();
 
+    if (id != this.id) return;
+
     // Spawn a bonus in its place
     const r = Math.round(100 * Math.random());
-    if (r <= this.bonusChance) this.spawnBonus();
+    if (r <= this.bonusChance) this.spawnBonus(id);
 
     // If all players are dead, game over.
     // If not, bump the score.
-    if (players.length <= 0)  this.gameOver();
+    if (Player.all.length <= 0)  this.gameOver();
     else                      this.bumpScore();
   }
 
@@ -126,11 +131,14 @@ export class Game {
   }
 
   // Spawn bonus
-  async spawnBonus() {
+  async spawnBonus(id) {
+    if (id != this.id) return;
+
     const bonus = new Bonus(this);
-    this.checkSpawn(bonus, [...bonuses, ...players]);
+    this.checkSpawn(bonus, [...Bonus.all, ...Player.all], id);
 
     const buffPlayers = event => {
+      if (id != this.id) return;
       if (bonus.used) return;
       if (event.detail.position.x != bonus.position.x || event.detail.position.y != bonus.position.y) return;
       bonus.used = true;
@@ -138,7 +146,7 @@ export class Game {
       if (bonus.type == 'clone') {
         const player = new Player(this);
         player.lives = event.detail.player.lives;
-        this.checkSpawn(player, [...bonuses, ...players]);
+        this.checkSpawn(player, [...Bonus.all, ...Player.all], id);
       }
     }
 
@@ -158,13 +166,19 @@ export class Game {
     return 5;
   }
 
+  // Duration of the tomb after death
+  get tombDuration() {
+    return 5000;
+  }
+
   // Checks if it's safe to spawn something at a random place
-  checkSpawn(thing, thingList) {
+  checkSpawn(thing, thingList, id) {
+    if (id != this.id) return;
     const rx = Math.round((this.columns - 1) * Math.random()) + 1;
     const ry = Math.round((this.rows - 1) * Math.random()) + 1;
     const alreadyThere = thingList.filter(p => (p.position.x == rx && p.position.y == ry));
     if (alreadyThere.length == 0) return thing.spawn(rx, ry);
-    else                          return this.checkSpawn(thing, thingList);
+    else                          return this.checkSpawn(thing, thingList, id);
   }
 
   // Bump the score
@@ -187,9 +201,19 @@ export class Game {
 
   // End the game
   gameOver() {
+    const allMeteors = document.querySelectorAll('.meteor');
+    allMeteors.forEach(m => m.remove());
+    const allBonuses = document.querySelectorAll('.bonus');
+    allBonuses.forEach(b => b.remove());
+    Bonus.resetAll();
+    const allPlayers = document.querySelectorAll('.player');
+    allPlayers.forEach(p => p.remove());
+    Player.resetAll();
+
     const element = document.querySelector('.game-over');
     element.classList.add('on');
     element.querySelector('button').focus();
+    
     this.score = 0;
     this.id = 0;
     this.meteorCount = 0;
@@ -211,11 +235,13 @@ export class Game {
       if (keys.left.includes(event.code)) directionX--;
       if (keys.right.includes(event.code)) directionX++;
 
-      await Promise.all(players.map(player => {
+      await Promise.all(Player.all.map(player => {
         // If a player is already on the destination tile, don't move there
-        const playersAlreadyThere = players.filter(p => (p.position.x == player.position.x + directionX && p.position.y == player.position.y + directionY));
+        const playersAlreadyThere = Player.all.filter(p => (p.position.x == player.position.x + directionX && p.position.y == player.position.y + directionY));
         if (playersAlreadyThere.length == 0)
           player.moveTo(player.position.x + directionX, player.position.y + directionY);
+
+        if (player.lives <= 0) return;
 
         // Switch sprite orientation based on the movement direction
         if (directionX > 0) player.element.classList.add('facing-right');

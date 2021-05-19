@@ -13,7 +13,7 @@ export default class Meteor {
     }
 
     // Duration of the mortal effect of meteors after crashing
-    this.killDuration = 500;
+    this.killDuration = 1000;
     this.destroyed = false;
   }
 

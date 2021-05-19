@@ -95,8 +95,8 @@ export class Game {
   // Time to wait between spawning meteors (ms)
   get timeBetweenMeteors() {
     const jmax = 100;
-    let i = 4;
-    for (let j = 4; j < jmax; j++) {
+    let i = 11;
+    for (let j = 11; j < jmax; j++) {
       if (this.meteorCount < i) return 10000 / j;
       i = i + j;
     }
@@ -119,10 +119,10 @@ export class Game {
     const jmax = 100;
     let i = 4;
     for (let j = 4; j < jmax; j++) {
-      if (this.meteorCount < i) return Math.max(70 - (j - 4) * 5, 25);
+      if (this.meteorCount < i) return Math.max(70 - Math.floor((j - 11) / 2) * 5, 50);
       i = i + j;
     }
-    return 25;
+    return 50;
   }
 
   // Spawn bonus

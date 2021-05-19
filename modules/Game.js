@@ -48,6 +48,20 @@ export class Game {
     }
     if (!keysActive) this.detectKeys();
 
+    // Place decorations
+    const decoTypes = 2;
+    for (let i = 0; i < 4; i++) {
+      const element = document.createElement('div');
+      element.classList.add('deco');
+      const r = Math.round((decoTypes - 1) * Math.random()) + 1;
+      element.classList.add(`deco${r}`);
+      const rx = Math.round((this.columns - 1) * Math.random()) + 1;
+      const ry = Math.round((this.rows - 1) * Math.random()) + 1;
+      element.style.setProperty('--column', rx);
+      element.style.setProperty('--row', ry);
+      this.container.appendChild(element);
+    }
+
     // Spawns the first player
     const player = new Player(this);
     player.spawn();
@@ -201,19 +215,21 @@ export class Game {
 
   // End the game
   gameOver() {
-    const allMeteors = document.querySelectorAll('.meteor');
+    const allMeteors = [...document.querySelectorAll('.meteor')];
     allMeteors.forEach(m => m.remove());
-    const allBonuses = document.querySelectorAll('.bonus');
+    const allBonuses = [...document.querySelectorAll('.bonus')];
     allBonuses.forEach(b => b.remove());
     Bonus.resetAll();
-    const allPlayers = document.querySelectorAll('.player');
+    const allPlayers = [...document.querySelectorAll('.player')];
     allPlayers.forEach(p => p.remove());
     Player.resetAll();
+    const allDecorations = [...document.querySelectorAll('.deco')];
+    allDecorations.forEach(d => d.remove());
 
     const element = document.querySelector('.game-over');
     element.classList.add('on');
     element.querySelector('button').focus();
-    
+
     this.score = 0;
     this.id = 0;
     this.meteorCount = 0;

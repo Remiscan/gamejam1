@@ -40,15 +40,20 @@ button {
   place-items: center;
 }
 
-.player {
+.sprite,
+.player,
+.meteor,
+.bonus,
+.deco {
   grid-column: var(--column);
   grid-row: var(--row);
-  
-  background-image: url('./assets/boole1.png');
   background-size: cover;
   image-rendering: pixelated;
-  transition: grid-column .1s linear,
-              grid-row .1s linear;
+  position: relative;
+}
+
+.player {
+  background-image: url('./assets/boole1.png');
   z-index: 5;
 }
 
@@ -61,12 +66,7 @@ button {
 }
 
 .bonus {
-  grid-column: var(--column);
-  grid-row: var(--row);
-
-  background-size: cover;
-  image-rendering: pixelated;
-  z-index: 1;
+  z-index: 2;
 }
 
 .bonus.clone {
@@ -74,15 +74,8 @@ button {
 }
 
 .meteor {
-  grid-column: var(--column);
-  grid-row: var(--row);
-  
   background-image: url('./assets/shadow2.png');
-  background-size: cover;
-  image-rendering: pixelated;
-  position: relative;
-  z-index: 0;
-
+  z-index: 1;
   animation: opacify .2s linear;
 }
 
@@ -123,6 +116,17 @@ button {
   grid-column: 1 / -1;
   grid-row: 1 / -1;
   place-items: center;
+}
+
+.deco {
+  z-index: 0;
+  background-color: black;
+}
+.deco1 {
+  background-image: url('./assets/deco.png');
+}
+.deco2 {
+  background-image: url('./assets/deco2.png');
 }
 
 .on {

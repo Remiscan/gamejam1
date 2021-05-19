@@ -40,15 +40,17 @@ export default class Player {
   }
 
   loseLife(id) {
+    if (id != this.game.id) return;
     this.lives--;
     if (this.lives <= 0) this.die(id);
   }
 
   async die(id) {
+    if (id != this.game.id) return;
     console.log(`Player ${this.id} dead`);
     this.element.classList.add('dead');
 
-    if (id == this.game.id && players.filter(p => p.lives <= 0).length == players.length) {
+    if (players.filter(p => p.lives <= 0).length == players.length) {
       window.dispatchEvent(new Event('gameover'));
     }
 

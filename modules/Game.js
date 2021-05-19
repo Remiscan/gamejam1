@@ -187,13 +187,9 @@ export class Game {
 
   // End the game
   gameOver() {
-    const meteors = document.querySelectorAll('.meteor');
-    meteors.forEach(m => m.remove());
-    const bonuses = document.querySelectorAll('.bonus');
-    bonuses.forEach(b => b.remove());
-    const players = document.querySelectorAll('.player');
-    players.forEach(p => p.remove());
-    document.querySelector('.game-over').classList.add('on');
+    const element = document.querySelector('.game-over');
+    element.classList.add('on');
+    element.querySelector('button').focus();
     this.score = 0;
     this.id = 0;
     this.meteorCount = 0;

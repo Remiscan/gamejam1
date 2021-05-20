@@ -122,8 +122,8 @@ export class Game {
 
     // Spawns meteors
     while (this.check('meteor spawn loop')) {
-      let r = Math.round((this.players.length - 1) * Math.random());
-      const player = this.players[r];
+      let r = Math.round((this.alivePlayers.length - 1) * Math.random());
+      const player = this.alivePlayers[r];
 
       r = Math.round(100 * Math.random());
       let rx, ry;

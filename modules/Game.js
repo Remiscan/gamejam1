@@ -368,6 +368,7 @@ export class Game {
   async detectKeys(event) {
     if (![...keys.up, ...keys.down, ...keys.left, ...keys.right].includes(event.key)) return;
     if (this.moving) return;
+    event.preventDefault();
     this.moving = true;
 
     let directionX = 0, directionY = 0;

@@ -16,6 +16,7 @@ export default class Player {
     };
     this.lives = options.lives;
     this.element = null;
+    this.canMove = false;
     this.destroyed = false;
   }
 
@@ -55,7 +56,9 @@ export default class Player {
       player: this
     } }));
 
-    return Params.wait(duration);
+    await Params.wait(duration);
+    this.canMove = false;
+    return;
   }
 
   // Remove a life from the player

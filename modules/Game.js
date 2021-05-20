@@ -377,17 +377,71 @@ export class Game {
     if (keys.left.includes(event.key)) directionX--;
     if (keys.right.includes(event.key)) directionX++;
 
-    await Promise.all(this.alivePlayers.map(player => {
+    const orderedPlayers = this.alivePlayers
+    .sort((p1, p2) => {
+      if (directionX != 0)
+        return Math.sign(p2.position.x - p1.position.x) * Math.sign(directionX);
+      else if (directionY != 0)
+        return Math.sign(p2.position.y - p1.position.y) * Math.sign(directionY);
+      else
+        return 0;
+    });
+
+    // Calculate which players can move and which can't
+    for (const player of orderedPlayers) {
       // Switch sprite orientation based on the movement direction
       if (directionX > 0) player.element.classList.add('facing-right');
       else if (directionX < 0) player.element.classList.remove('facing-right');
 
-      // If a player or a pond is already on the destination tile, don't move
-      const playersAlreadyThere = [...this.players, ...this.ponds].filter(p => (p.position.x == player.position.x + directionX && p.position.y == player.position.y + directionY && !p.destroyed));
-      if (playersAlreadyThere.length == 0)
+      // If the player is moving towards the edge of the map, don't move
+      if (
+        (directionX > 0 && player.position.x == Params.columns)
+        || (directionX < 0 && player.position.x == 1)
+        || (directionY > 0 && player.position.y == Params.rows)
+        || (directionY < 0 && player.position.y == 1)
+      ) {
+        player.canMove = false;
+        if (Params.log) console.log(`Player (x: ${player.position.x}, y: ${player.position.y}) can't move to (x: ${player.position.x + directionX}, y: ${player.position.y + directionY}) because: EDGE`);
+        continue;
+      }
+
+      // If the player is moving towards a lava pond or a tomb, don't move
+      const obstacleThere = [...this.players.filter(p => p.lives <= 0 && !p.destroyed), ...this.ponds].filter(o => o.position.x == player.position.x + directionX && o.position.y == player.position.y + directionY);
+      if (obstacleThere.length > 0) {
+        player.canMove = false;
+        if (Params.log) console.log(`Player (x: ${player.position.x}, y: ${player.position.y}) can't move to (x: ${player.position.x + directionX}, y: ${player.position.y + directionY}) because: LAVA OR TOMB`);
+        continue;
+      }
+
+      // If the player is moving towards another alive player, only move if the other player can move too
+      const playerThere = [...this.alivePlayers.filter(p => p.lives > 0 && !p.destroyed && p.position.x == player.position.x + directionX && p.position.y == player.position.y + directionY)];
+      if (playerThere.length == 0) {
+        player.canMove = true;
+        if (Params.log) console.log(`Player (x: ${player.position.x}, y: ${player.position.y}) CAN move to (x: ${player.position.x + directionX}, y: ${player.position.y + directionY}) because: NO ONE THERE`);
+        continue;
+      }
+      else if (playerThere.length > 0) {
+        if (playerThere.reduce((sum, p) => sum + p.canMove, 0) == playerThere.length) {
+          player.canMove = true;
+          if (Params.log) console.log(`Player (x: ${player.position.x}, y: ${player.position.y}) CAN move to (x: ${player.position.x + directionX}, y: ${player.position.y + directionY}) because: PLAYER THERE CAN MOVE TOO`);
+          continue
+        }
+        else {
+          player.canMove = false;
+          if (Params.log) console.log(`Player (x: ${player.position.x}, y: ${player.position.y}) can't move to (x: ${player.position.x + directionX}, y: ${player.position.y + directionY}) because: PLAYER THERE CAN'T MOVE`);
+          continue;
+        }
+      }
+    }
+
+    // Actually move the players who can
+    await Promise.all(orderedPlayers.map(player => {
+      if (player.canMove)
         return player.moveTo(player.position.x + directionX, player.position.y + directionY, this.playerMoveDuration);
-      else return;
+      else
+        return;
     }));
+
     this.moving = false;
     return;
   }

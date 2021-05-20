@@ -5,7 +5,7 @@ class Params {
     this.cellSize = Number(containerStyles.getPropertyValue('--cell-size'));
     this.columns = Number(containerStyles.getPropertyValue('--columns'));
     this.rows = Number(containerStyles.getPropertyValue('--rows'));
-    this.log = true;
+    this.log = false;
     this.sounds = null;
     this.audioCtx = null;
     this.prepareSounds();

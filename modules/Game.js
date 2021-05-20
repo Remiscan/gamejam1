@@ -256,7 +256,6 @@ export class Game {
     if (cellAreadyOccupied) return;
 
     // Don't create a bonus if there's already one on screen
-    console.log(this.bonuses.filter(b => !b.used && !b.destroyed));
     if (this.bonuses.filter(b => !b.used && !b.destroyed).length > 0) return;
 
     const bonus = new Bonus({ position: { x: meteor.position.x, y: meteor.position.y } });

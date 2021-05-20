@@ -357,7 +357,7 @@ button {
   background-image: url('./assets/lava/lava_tile_border_left.png');
 }
 .lava.right {
-  background-image: url('./assets/lava/lava_tile_boder_right.png');
+  background-image: url('./assets/lava/lava_tile_border_right.png');
 }
 .lava.top.left {
   background-image: url('./assets/lava/lava_tile_angle_topleft.png');

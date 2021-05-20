@@ -331,15 +331,15 @@ export class Game {
 
   // Detects key presses
   async detectKeys(event) {
-    if (![...keys.up, ...keys.down, ...keys.left, ...keys.right].includes(event.code)) return;
+    if (![...keys.up, ...keys.down, ...keys.left, ...keys.right].includes(event.key)) return;
     if (this.moving) return;
     this.moving = true;
 
     let directionX = 0, directionY = 0;
-    if (keys.up.includes(event.code)) directionY--;
-    if (keys.down.includes(event.code)) directionY++;
-    if (keys.left.includes(event.code)) directionX--;
-    if (keys.right.includes(event.code)) directionX++;
+    if (keys.up.includes(event.key)) directionY--;
+    if (keys.down.includes(event.key)) directionY++;
+    if (keys.left.includes(event.key)) directionX--;
+    if (keys.right.includes(event.key)) directionX++;
 
     await Promise.all(this.alivePlayers.map(player => {
       // Switch sprite orientation based on the movement direction

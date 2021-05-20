@@ -263,9 +263,10 @@ button {
 .player,
 .meteor,
 .bonus,
-.deco {
-  grid-column: var(--column);
-  grid-row: var(--row);
+.deco,
+.lava {
+  grid-column: var(--column, auto);
+  grid-row: var(--row, auto);
   background-size: cover;
   image-rendering: pixelated;
   position: relative;
@@ -289,7 +290,7 @@ button {
 /* Bonus */
 
 .bonus {
-  z-index: 2;
+  z-index: 1;
 }
 
 .bonus.clone {
@@ -305,7 +306,7 @@ button {
 
 .meteor {
   background-image: url('./assets/shadow2.png');
-  z-index: 1;
+  z-index: 3;
   animation: opacify .2s linear;
 }
 
@@ -339,6 +340,40 @@ button {
 }
 .deco2 {
   background-image: url('./assets/deco2.png');
+}
+
+/* Pond */
+
+.lava {
+  background-image: url('./assets/lava/lava_tile.png');
+  background-color: black;
+}
+.lava.top {
+  background-image: url('./assets/lava/lava_tile_border_top.png');
+}
+.lava.bottom {
+  background-image: url('./assets/lava/lava_tile_border_top.png');
+}
+.lava.left {
+  background-image: url('./assets/lava/lava_tile_border_left.png');
+}
+.lava.right {
+  background-image: url('./assets/lava/lava_tile_boder_right.png');
+}
+.lava.top.left {
+  background-image: url('./assets/lava/lava_tile_angle_topleft.png');
+}
+.lava.top.right {
+  background-image: url('./assets/lava/lava_tile_angle_topright.png');
+}
+.lava.bottom.left {
+  background-image: url('./assets/lava/lava_tile_angle_bottomleft.png');
+}
+.lava.bottom.right {
+  background-image: url('./assets/lava/lava_tile_angle_bottomright.png');
+}
+.lava.bottom:not(.left):not(.right) {
+  transform: scaleY(-1);
 }
 
 

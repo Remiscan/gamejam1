@@ -3,6 +3,7 @@ import Player from './Player.js';
 import Meteor from './Meteor.js';
 import Bonus from './Bonus.js';
 import Decoration from './Decoration.js';
+import Pond from './Pond.js';
 
 
 const keys = {
@@ -22,6 +23,7 @@ export class Game {
     this.players = [];
     this.bonuses = [];
     this.meteors = [];
+    this.ponds = [];
     this.meteorCount = 0;
 
     this.score = 0;
@@ -117,6 +119,12 @@ export class Game {
       decoration.spawn();
     }
 
+    // Place ponds
+    const pond = new Pond();
+    this.ponds = [...this.ponds, ...pond.cells];
+    console.log(this.ponds);
+    pond.spawn();
+
     // Spawn the first player
     this.createPlayer();
 
@@ -210,6 +218,12 @@ export class Game {
   async createBonus(meteor) {
     if (!this.check('createBonus')) return;
 
+    // Don't create a bonus if the boulder fell in a pond or on another bonus
+    const cellAreadyOccupied =  ([...this.bonuses, ...this.ponds]
+                                .filter(b => b.position.x == meteor.position.x && b.position.y == meteor.position.y &&!b.destroyed)
+                                .length) > 0;
+    if (cellAreadyOccupied) return;
+
     const bonus = new Bonus({ position: { x: meteor.position.x, y: meteor.position.y } });
     bonus.spawn();
 
@@ -243,7 +257,8 @@ export class Game {
     const currentElements = [
       ...this.players.filter(p => !p.destroyed),
       ...this.bonuses.filter(b => !b.destroyed),
-      ...this.meteors.filter(m => !m.destroyed)
+      ...this.meteors.filter(m => !m.destroyed),
+      ...this.ponds
     ];
 
     for (let column = 1; column < Params.columns; column++) {
@@ -325,8 +340,8 @@ export class Game {
       if (directionX > 0) player.element.classList.add('facing-right');
       else if (directionX < 0) player.element.classList.remove('facing-right');
 
-      // If a player is already on the destination tile, don't move
-      const playersAlreadyThere = this.players.filter(p => (p.position.x == player.position.x + directionX && p.position.y == player.position.y + directionY && !p.destroyed));
+      // If a player or a pond is already on the destination tile, don't move
+      const playersAlreadyThere = [...this.players, ...this.ponds].filter(p => (p.position.x == player.position.x + directionX && p.position.y == player.position.y + directionY && !p.destroyed));
       if (playersAlreadyThere.length == 0)
         return player.moveTo(player.position.x + directionX, player.position.y + directionY, this.playerMoveDuration);
       else return;

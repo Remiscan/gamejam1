@@ -123,7 +123,7 @@ export class Game {
     }
 
     // Place ponds
-    const numberofPonds = 1/* + Math.round(Math.random())*/;
+    const numberofPonds = 1 + Math.round(Math.random());
     const ponds = [];
     switch (numberofPonds) {
       case 1:

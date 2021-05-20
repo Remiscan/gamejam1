@@ -157,7 +157,10 @@ export class Game {
 
     // Spawn the first player
     const cell = this.getEmptyCell();
-    this.createPlayer({ position: { x: cell.x, y: cell.y }, lives: 1 });
+    if (numberofPonds > 0)
+      this.createPlayer({ position: { x: cell.x, y: cell.y }, lives: 1 });
+    else
+      this.createPlayer({ position: { x: Math.round(Params.columns / 2), y: Math.round(Params.rows / 2) }, lives: 1 });
 
     // Spawns meteors
     while (this.check('meteor spawn loop')) {

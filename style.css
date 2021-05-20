@@ -64,6 +64,8 @@ button:hover {
   height: 32px;
 }
 
+/* Title screen & game over screen */
+
 .title-screen {
   grid-column: 1 / -1;
   grid-row: 1;

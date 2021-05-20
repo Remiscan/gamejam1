@@ -1,5 +1,6 @@
 import Params from './Params.js';
 
+
 const bonusTypes = ['clone'];
 
 export default class Bonus {

@@ -1,5 +1,6 @@
 import Params from './Params.js';
 
+
 const decorationTypes = 2;
 
 export default class Decoration {

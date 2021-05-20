@@ -1,5 +1,6 @@
 import Params from './Params.js';
 
+
 export default class Player {
   constructor(options = {
     position: {

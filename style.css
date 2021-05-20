@@ -66,6 +66,11 @@ button:hover {
 
 /* Title screen & game over screen */
 
+.title-screen,
+.game {
+  color: white;
+}
+
 .title-screen {
   grid-column: 1 / -1;
   grid-row: 1;

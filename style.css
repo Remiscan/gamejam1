@@ -4,7 +4,8 @@
 
 @font-face {
   font-family: 'Red Alert';
-  src: url('./assets/font/C&C\ Red\ Alert\ [INET].ttf') format("truetype");
+  src: url('./assets/font/CCRedAlertINET.woff2') format('woff2'),
+       url('./assets/font/CCRedAlertINET.woff') format('woff');
 }
 
 html {

@@ -120,10 +120,40 @@ export class Game {
     }
 
     // Place ponds
-    const pond = new Pond();
-    this.ponds = [...this.ponds, ...pond.cells];
-    console.log(this.ponds);
-    pond.spawn();
+    const numberofPonds = 1/* + Math.round(Math.random())*/;
+    const ponds = [];
+    switch (numberofPonds) {
+      case 1:
+        const pond = new Pond();
+        ponds.push(pond);
+        break;
+      case 2:
+        const pond1 = new Pond({
+          position: {
+            x: 3 + Math.round(1 * Math.random()),
+            y: 3 + Math.round(3 * Math.random())
+          }, size: {
+            width: 2,
+            height: 2
+          }
+        });
+        ponds.push(pond1);
+        const pond2 = new Pond({
+          position: {
+            x: 9 + Math.round(1 * Math.random()),
+            y: 3 + Math.round(3 * Math.random())
+          }, size: {
+            width: 2,
+            height: 2
+          }
+        });
+        ponds.push(pond2);
+        break;
+    }
+    for (const pond of ponds) {
+      this.ponds = [...this.ponds, ...pond.cells];
+      pond.spawn();
+    }
 
     // Spawn the first player
     const cell = this.getEmptyCell();

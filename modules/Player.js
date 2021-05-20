@@ -61,13 +61,14 @@ export default class Player {
   loseLife(tombDuration) {
     this.lives--;
     if (Params.log) console.log(`Player ${this.id} lost a life (${this.lives} remaining)`);
-    if (this.lives <= 0) this.die(tombDuration);
+    if (this.lives == 0) this.die(tombDuration);
   }
 
   // Kill the player
   async die(tombDuration) {
     if (Params.log) console.log(`Player ${this.id} died`);
     this.element.classList.add('dead');
+    Params.playSound('ouch');
 
     await new Promise(resolve => setTimeout(resolve, tombDuration));
     

@@ -218,6 +218,7 @@ export class Game {
       if (event.detail.position.x != bonus.position.x || event.detail.position.y != bonus.position.y) return;
 
       bonus.used = true;
+      Params.playSound('bonus');
       bonus.destroy();
       this.updateElements();
 

@@ -57,23 +57,25 @@ export class Game {
   // Duration of a meteor fall (ms)
   get fallDuration() {
     const jmax = 100;
+    const lastValue = 1500;
     let i = 4;
     for (let j = 4; j < jmax; j++) {
-      if (this.meteorCount < i) return Math.max(5000 - 1000 * Math.floor((j - 3) / 3), 2000);
+      if (this.meteorCount < i) return Math.max(5000 - 500 * Math.floor((j - 3) / 3), lastValue);
       i = i + j;
     }
-    return 2000;
+    return lastValue;
   }
 
   // Probability of a meteor to generate on a player (%)
   get aimAtPlayer() {
     const jmax = 100;
+    const lastValue = 30;
     let i = 4;
     for (let j = 4; j < jmax; j++) {
-      if (this.meteorCount < i) return Math.max(70 - Math.floor((j - 11) / 2) * 5, 50);
+      if (this.meteorCount < i) return Math.max(70 - Math.floor((j - 11) / 2) * 5, lastValue);
       i = i + j;
     }
-    return 50;
+    return lastValue;
   }
 
   // Duration of a bonus on the map (ms)
@@ -83,7 +85,8 @@ export class Game {
 
   // Probability of spawning a bonus (%)
   get bonusChance() {
-    return 5;
+    if (this.meteorCount < 100) return 5;
+    return 2.5;
   }
 
   // Duration of the tomb on the map after death (ms)

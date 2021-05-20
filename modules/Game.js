@@ -123,7 +123,7 @@ export class Game {
     }
 
     // Place ponds
-    const numberofPonds = 1 + Math.round(Math.random());
+    const numberofPonds = 2/* + Math.round(Math.random())*/;
     const ponds = [];
     switch (numberofPonds) {
       case 1:
@@ -160,7 +160,7 @@ export class Game {
 
     // Spawn the first player
     const cell = this.getEmptyCell();
-    if (numberofPonds > 0)
+    if (numberofPonds == 1)
       this.createPlayer({ position: { x: cell.x, y: cell.y }, lives: 1 });
     else
       this.createPlayer({ position: { x: Math.round(Params.columns / 2), y: Math.round(Params.rows / 2) }, lives: 1 });

@@ -111,17 +111,16 @@ button:hover {
   grid-row: 2;
   display: grid;
   grid-template-rows: 64px;
-  grid-template-columns: 64px 64px;
+  grid-template-columns: repeat(auto-fill, 64px);
   margin: auto;
 }
 
-.fleurs {
+.herbe {
   grid-row: 1;
-  grid-column: 1;
   background-image: url('./assets/deco2.png');
 }
 
-.herbe {
+.fleurs {
   grid-row: 1;
   grid-column: 2;
   background-image: url('./assets/deco.png');

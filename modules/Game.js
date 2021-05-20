@@ -113,7 +113,7 @@ export class Game {
     window.addEventListener('keydown', this.detectKeys.bind(this));
 
     // Place decorations
-    const decorationsNumber = 4;
+    const decorationsNumber = 6;
     for (let i = 0; i < decorationsNumber; i++) {
       const decoration = new Decoration();
       decoration.spawn();

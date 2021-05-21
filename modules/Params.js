@@ -5,6 +5,7 @@ class Params {
     this.cellSize = Number(containerStyles.getPropertyValue('--cell-size'));
     this.columns = Number(containerStyles.getPropertyValue('--columns'));
     this.rows = Number(containerStyles.getPropertyValue('--rows'));
+    this.savePath = 'boole-and-the-boulders-best-score';
     this.log = false;
     this.sounds = null;
     this.audioCtx = null;

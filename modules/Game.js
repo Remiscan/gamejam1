@@ -15,7 +15,7 @@ const keys = {
 let activeGame;
 
 
-export class Game {
+export default class Game {
   constructor() {
     this.id = Date.now();
     activeGame = this.id;
@@ -27,7 +27,7 @@ export class Game {
     this.meteorCount = 0;
 
     this.score = 0;
-    this.bestScore = Number(localStorage.getItem('boole-best-score')) || 0;
+    this.bestScore = Number(localStorage.getItem(Params.savePath)) || 0;
     
     this.moving = false;
     this.over = false;
@@ -341,7 +341,7 @@ export class Game {
   updateBestScore() {
     if (this.score > this.bestScore) {
       this.bestScore = this.score;
-      localStorage.setItem('boole-best-score', this.bestScore);
+      localStorage.setItem(Params.savePath, this.bestScore);
       const bestScoreElements = document.querySelectorAll('.best-score');
       bestScoreElements.forEach(e => e.innerHTML = this.bestScore);
     }

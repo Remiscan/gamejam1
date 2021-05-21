@@ -69,7 +69,7 @@ export default class Game {
   // Probability of a meteor to generate on a player (%)
   get aimAtPlayer() {
     const jmax = 100;
-    const lastValue = 30;
+    const lastValue = 20;
     let i = 4;
     for (let j = 4; j < jmax; j++) {
       if (this.meteorCount < i) return Math.max(70 - Math.floor((j - 11) / 2) * 5, lastValue);

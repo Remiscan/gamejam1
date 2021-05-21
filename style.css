@@ -286,6 +286,7 @@ button {
 
 .player.dead {
   background-image: url('./assets/tomb.png');
+  z-index: 7;
 }
 
 /* Bonus */

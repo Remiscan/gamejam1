@@ -310,6 +310,7 @@ button {
   z-index: 3;
   animation: opacify .2s linear;
   opacity: 1;
+  transform: translateY(8px);
 }
 
 .meteor-shade.bigger {

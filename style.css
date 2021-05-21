@@ -262,6 +262,7 @@ button {
 .sprite,
 .player,
 .meteor,
+.meteor-shade,
 .bonus,
 .deco,
 .lava {
@@ -304,18 +305,23 @@ button {
   100% { opacity: 1; }
 }
 
-.meteor {
+.meteor-shade {
   background-image: url('./assets/shadow2.png');
   z-index: 3;
   animation: opacify .2s linear;
+  opacity: 1;
 }
 
-.meteor.bigger {
+.meteor-shade.bigger {
   background-image: url('./assets/shadow1.png');
 }
 
-.meteor.biggest {
+.meteor-shade.biggest {
   background-image: url('./assets/shadow3.png');
+}
+
+.meteor {
+  z-index: 6;
 }
 
 .meteor>.body {
@@ -325,8 +331,6 @@ button {
   background-image: url('./assets/boulder.png');
   background-size: cover;
   image-rendering: pixelated;
-  bottom: 100%;
-  z-index: 2;
 }
 
 /* Decoration */

@@ -24,8 +24,16 @@ export default class Meteor {
     element.style.setProperty('--column', this.position.x);
     element.style.setProperty('--row', this.position.y);
     element.innerHTML = '<div class="body"></div>';
-    Params.container.appendChild(element);
     this.element = element;
+
+    const shade = document.createElement('div');
+    shade.classList.add('meteor-shade');
+    shade.style.setProperty('--column', this.position.x);
+    shade.style.setProperty('--row', this.position.y);
+    this.shade = shade;
+
+    Params.container.appendChild(shade);
+    Params.container.appendChild(element);
 
     //if (Params.log) console.log(`Meteor falling towards (x: ${this.position.x}, y: ${this.position.y})`);
   }
@@ -39,13 +47,15 @@ export default class Meteor {
       fill: 'backwards',
       easing: 'linear'
     });
-    setTimeout(() => this.element.classList.add('bigger'), 4 * duration / 8);
-    setTimeout(() => this.element.classList.add('biggest'), 6 * duration / 8);
+    setTimeout(() => this.shade.classList.add('bigger'), 4 * duration / 8);
+    setTimeout(() => this.shade.classList.add('biggest'), 6 * duration / 8);
+    fallAnimation.addEventListener('finish', () => this.element.classList.add('fallen'));
     return Params.wait(fallAnimation);
   }
 
   destroy() {
     this.element?.remove();
+    this.shade?.remove();
     this.destroyed = true;
   }
 }

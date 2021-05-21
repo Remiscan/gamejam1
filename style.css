@@ -352,6 +352,7 @@ button {
 .lava {
   background-image: url('./assets/lava/lava_tile.png');
   background-color: black;
+  z-index: 1;
 }
 .lava.top {
   background-image: url('./assets/lava/lava_tile_border_top.png');

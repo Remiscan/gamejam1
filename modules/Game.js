@@ -7,10 +7,10 @@ import Pond from './Pond.js';
 
 
 const keys = {
-  up: ['ArrowUp'],
-  down: ['ArrowDown'],
-  left: ['ArrowLeft'],
-  right: ['ArrowRight']
+  up: ['ArrowUp', 'KeyW'],
+  down: ['ArrowDown', 'KeyS'],
+  left: ['ArrowLeft', 'KeyA'],
+  right: ['ArrowRight', 'KeyD']
 };
 let activeGame;
 
@@ -366,16 +366,16 @@ export default class Game {
 
   // Detects key presses
   async detectKeys(event) {
-    if (![...keys.up, ...keys.down, ...keys.left, ...keys.right].includes(event.key)) return;
+    if (![...keys.up, ...keys.down, ...keys.left, ...keys.right].includes(event.code || event.key)) return;
     if (this.moving) return;
     event.preventDefault();
     this.moving = true;
 
     let directionX = 0, directionY = 0;
-    if (keys.up.includes(event.key)) directionY--;
-    if (keys.down.includes(event.key)) directionY++;
-    if (keys.left.includes(event.key)) directionX--;
-    if (keys.right.includes(event.key)) directionX++;
+    if (keys.up.includes(event.code || event.key)) directionY--;
+    if (keys.down.includes(event.code || event.key)) directionY++;
+    if (keys.left.includes(event.code || event.key)) directionX--;
+    if (keys.right.includes(event.code || event.key)) directionX++;
 
     const orderedPlayers = this.alivePlayers
     .sort((p1, p2) => {

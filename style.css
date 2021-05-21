@@ -206,10 +206,10 @@ button:hover {
 }
 
 .ombre1 {
-  background-image: url('./assets/shadow2.png');
+  background-image: url('./assets/shadow1.png');
 }
 .ombre2 {
-  background-image: url('./assets/shadow1.png');
+  background-image: url('./assets/shadow2.png');
 }
 .ombre3 {
   background-image: url('./assets/shadow3.png');
@@ -307,7 +307,7 @@ button {
 }
 
 .meteor-shade {
-  background-image: url('./assets/shadow2.png');
+  background-image: url('./assets/shadow1.png');
   z-index: 3;
   animation: opacify .2s linear;
   opacity: 1;
@@ -315,7 +315,7 @@ button {
 }
 
 .meteor-shade.bigger {
-  background-image: url('./assets/shadow1.png');
+  background-image: url('./assets/shadow2.png');
 }
 
 .meteor-shade.biggest {

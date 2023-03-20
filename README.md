@@ -9,6 +9,4 @@ This game was made for [LM0B Beginners Game Jam #28](https://itch.io/jam/lm0b-be
 
 ![Gameplay](https://img.itch.zone/aW1hZ2UvMTA0ODM1OS82MDA4MzM1LnBuZw==/original/JJTJRG.png)
 
-![Gameplay](https://img.itch.zone/aW1hZ2UvMTA0ODM1OS82MDA4MzM2LnBuZw==/original/U1qah%2B.png)
-
 Play it at <https://remiscan.itch.io/boole-and-the-boulders>.

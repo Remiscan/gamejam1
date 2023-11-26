@@ -61,6 +61,10 @@ button:hover {
   height: calc(var(--rows) * var(--cell-size) * 1px + 32px);
 }
 
+body:not([data-translated]) .container {
+  opacity: 0;
+}
+
 .score-container {
   grid-column: 1 / -1;
   grid-row: 2;

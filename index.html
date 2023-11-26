@@ -22,22 +22,22 @@
     <div class="container">
       <div class="title-screen">
         <div class="title">
-          <span class="le-titre">Boole and the Boulders</span>
+          <span class="le-titre" data-string="title"></span>
           <div class="title-icons">
             <div class="icone herbe"></div>
             <div class="icone fleurs"></div>
             <div class="icone boole"></div>
           </div>
-          <span class="description">This is the end of the world. Boulders are falling from the sky and Boole the frog wants to live.</span>
+          <span class="description" data-string="description"></span>
         </div>
         <div class="you-lost">
-          <span class="le-titre">Game Over</span>
+          <span class="le-titre" data-title="game-over"></span>
           <div class="title-icons">
             <div class="icone herbe"></div>
             <div class="icone fleurs"></div>
             <div class="icone tombe"></div>
           </div>
-          <span class="description">R.I.P. Boole</span>
+          <span class="description" data-string="game-over-description"></span>
         </div>
         <div class="tutorial">
           <div class="tutorial-element">
@@ -47,7 +47,7 @@
               <div class="icone ombre3"></div>
               <div class="icone boulder"></div>
             </div>
-            <span>Avoid the falling boulders</span>
+            <span data-string="instruction-1"></span>
           </div>
           <div class="tutorial-element">
             <div class="icones-fleches">
@@ -58,23 +58,23 @@
               <div class="icone fleche bas"></div>
               <div class="icone fleche droite"></div>
             </div>
-            <span>Move Boole with the arrow keys</span>
+            <span data-string="instruction-2"></span>
           </div>
           <div class="tutorial-element">
             <div class="icone icone-bonus"></div>
-            <span>Pick up the bonuses to activate Boole's reproductive powers</span>
+            <span data-string="instruction-3"></span>
           </div>
         </div>
-        <button class="play-button first-start">Click here to play</button>
-        <button class="play-button try-again">Click here to try again</button>
+        <button class="play-button first-start" data-string="click-start"></button>
+        <button class="play-button try-again" data-string="click-dead"></button>
       </div>
 
       <div class="game"></div>
 
       <div class="score-container">
-        <p>Score: <span class="score">0</span></p>
-        <p>Best score: <span class="best-score">0</span></p>
-        <p><input type="checkbox" id="mute"><label for="mute">Mute</label></p>
+        <p><span data-string="score"></span> <span class="score">0</span></p>
+        <p><span data-string="best-score"></span> <span class="best-score">0</span></p>
+        <p><input type="checkbox" id="mute"><label for="mute" data-string="mute"></label></p>
       </div>
     </div>
 
